@@ -13,6 +13,5 @@ self.onmessage = function(e) {
         return star;
     });
 
-    // Devolvemos las estrellas actualizadas al hilo principal
     self.postMessage({ updatedStars });
 };

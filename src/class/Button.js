@@ -16,8 +16,8 @@ class Button {
         const textWidth = textMetrics.width;
         const textHeight = textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent;
 
-        this.width = textWidth + 50; // Add some padding
-        this.height = textHeight + 25; // Add some padding
+        this.width = textWidth + 50;
+        this.height = textHeight + 25;
 
         const gradient = this.ctx.createLinearGradient(this.x, this.y, this.x + this.width, this.y);
         gradient.addColorStop(0, '#28285a');
