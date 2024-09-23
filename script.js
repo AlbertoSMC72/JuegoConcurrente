@@ -69,7 +69,18 @@ class Game {
         this.message = '';
         this.enemyCount = 0;
         this.controllerType = 0;
+
+        // Crear el Worker
+        this.backgroundWorker = new Worker('./src/workers/backgroundWorker.js');
+        this.arrayOfStars = [];
         this.prepareInGameBackground();
+
+        // Recibir los datos actualizados del Worker
+        this.backgroundWorker.onmessage = (e) => {
+            const { updatedStars } = e.data;
+            this.arrayOfStars = updatedStars;
+        };
+
         this.prepareButtons();
     }
 
@@ -248,29 +259,29 @@ class Game {
 
 
     drawBackground() {
+        // Enviar los datos al Worker
+        this.backgroundWorker.postMessage({
+            width: this.width,
+            height: this.height,
+            arrayOfStars: this.arrayOfStars
+        });
+
+        // Dibujar el fondo
         this.ctx.beginPath();
-        this.ctx.fillStyle = "#19061F"
+        this.ctx.fillStyle = "#19061F";
         this.ctx.fillRect(0, 0, this.width, this.height);
         for (let star of this.arrayOfStars) {
             this.ctx.beginPath();
             this.ctx.fillStyle = `rgba(156,155,155,${Math.sin(-Date.now() * 0.0000001 + (star.x + star.y) * 0.07)})`;
             this.ctx.fillRect(star.x, star.y, 5, 5);
             this.ctx.closePath();
-            star.x -= 0.1;
-            star.y -= 0.1;
-            if (star.x < 0) {
-                star.x = this.width;
-            }
-            if (star.y < 0) {
-                star.y = this.height;
-            }
         }
     }
 
     prepareInGameBackground() {
         this.arrayOfStars = [];
         for (let i = 0; i < Math.floor(this.width * this.height / 2500); i++) {
-            this.arrayOfStars.push({x: Math.random() * this.width, y: Math.random() * this.height})
+            this.arrayOfStars.push({ x: Math.random() * this.width, y: Math.random() * this.height });
         }
         console.log("Generated array of stars");
     }

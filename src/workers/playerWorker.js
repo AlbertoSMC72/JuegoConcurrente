@@ -1,5 +1,3 @@
-// playerWorker.js
-
 self.onmessage = function(e) {
     const { type, data } = e.data;
 
@@ -16,7 +14,6 @@ self.onmessage = function(e) {
     }
 };
 
-// Función para controlar el teclado
 function handleKeyboardMovement({ keysStatus, self, speed, width, height, canvas }) {
     if (keysStatus.SPACEBAR) {
         self.fire();
@@ -37,7 +34,6 @@ function handleKeyboardMovement({ keysStatus, self, speed, width, height, canvas
     self.postMessage({ x: self.x, y: self.y });
 }
 
-// Funciones para manejar otros controles (ratón y toque)
 function handleMouseMovement({ mouseX, mouseY, width, height }) {
     self.postMessage({ x: mouseX - width / 2, y: mouseY - height / 2 });
 }
