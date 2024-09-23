@@ -67,13 +67,13 @@ class Player {
         // Mostrar las diferentes imágenes en función del tiempo transcurrido
         if (timeMoving < 300) {
             // Fase 1: Primera imagen del jugador
-            playerImg.src = 'images/player/player_1.png';
+            playerImg.src = 'src/assets/player/player_1.png';
         } else if (timeMoving < 600) {
             // Fase 2: Segunda imagen del jugador
-            playerImg.src = 'images/player/player_2.png';
+            playerImg.src = 'src/assets/player/player_2.png';
         } else {
             // Fase 3: Tercera imagen del jugador
-            playerImg.src = 'images/player/player_3.png';
+            playerImg.src = 'src/assets/player/player_3.png';
         }
         
         // Dibujar la imagen del jugador en el lienzo
@@ -90,7 +90,7 @@ class Player {
 
     drawLifes() {
         const shieldImg = new Image();
-        shieldImg.src = 'images/player/energia.gif';
+        shieldImg.src = 'src/assets/player/energia.gif';
         const lifeSize = 30;
         for (let i = 0; i < this.countOfLives; i++) {
             this.ctx.drawImage(shieldImg, 10 + i * (lifeSize + 10), 10, lifeSize, lifeSize);
@@ -112,7 +112,7 @@ class Player {
 
     drawImmortal() {
         const shieldImg = new Image();
-        shieldImg.src = 'images/shields.png';
+        shieldImg.src = 'src/assets/shields.png';
         this.ctx.drawImage(
             shieldImg,
             this.x - this.width / 2,

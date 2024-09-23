@@ -14,10 +14,10 @@ class Obstacle {
 
         // Cargar la imagen solo una vez
         this.meteorImage = new Image();
-        this.meteorImage.src = 'images/meteorito.png';
+        this.meteorImage.src = 'src/assets/meteorito.png';
 
         // Crear el worker
-        this.worker = new Worker('./class/obstacleWorker.js');
+        this.worker = new Worker('./src/workers/obstacleWorker.js');
         this.worker.onmessage = this.updateFromWorker.bind(this);
     }
 

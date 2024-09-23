@@ -49,8 +49,6 @@ class Button {
     }
 }
 
-let worker = new Worker('./class/gameWorker.js');
-
 class Game {
     constructor(ctx) {
         this.drawableObjects = {
@@ -64,25 +62,15 @@ class Game {
         this.height = window.innerHeight;
         this.inBeforeGameMenu = true;
         this.inAfterGameMenu = false;
+        this.timeOfLastObstacle = Date.now();
+        this.frequencyOfObstacle = 1000 + 100 * Math.random();
         this.currentScore = 0;
         this.bestScore = 0;
+        this.message = '';
         this.enemyCount = 0;
         this.controllerType = 0;
         this.prepareInGameBackground();
         this.prepareButtons();
-        this.setupWorkerListeners(); // Configura listeners para el Worker
-    }
-
-    setupWorkerListeners() {
-        // Recibir mensajes del Worker
-        worker.onmessage = (e) => {
-            if (e.data.obstacle) {
-                const { x, y, speed, angle } = e.data.obstacle;
-                this.drawableObjects[1].push(
-                    new Obstacle(x, y, this.ctx, this, speed, angle)
-                );
-            }
-        };
     }
 
     prepare() {
@@ -111,16 +99,19 @@ class Game {
     }
 
     createObstacle() {
-        // Enviar tarea de creación de obstáculos al Worker
-        worker.postMessage({
-            task: 'createObstacle',
-            canvasWidth: canvas.width,
-            canvasHeight: canvas.height,
-        });
+        if (Date.now() - this.frequencyOfObstacle - this.timeOfLastObstacle > 0) {
+            this.timeOfLastObstacle = Date.now();
+            this.frequencyOfObstacle = 1000 + 500 * Math.random();
+            this.drawableObjects[1].push(
+                new Obstacle(canvas.width * Math.random(), 0, this.ctx, this, 4 + 3 * Math.random(), Math.PI * Math.random())
+            );
+        }
     }
 
     draw() {
+        // Draw level 0
         this.drawBackground();
+        // Draw level 1
         if (this.enemyCount <= 0 && !this.inBeforeGameMenu) {
             if (this.level === this.levelsCount) {
                 this.drawableObjects[0].length = 0;
@@ -141,27 +132,7 @@ class Game {
         } else {
             this.inGame();
         }
-    }
 
-    inGame() {
-        this.createObstacle(); // Llamar al Worker para crear obstáculos
-        for (const obj of this.drawableObjects[0]) {
-            obj.draw();
-        }
-        this.drawableObjects[0] = this.drawableObjects[0].filter(item => !item.del);
-        for (const obj of this.drawableObjects[1]) {
-            obj.draw();
-        }
-        this.drawableObjects[1] = this.drawableObjects[1].filter(item => !item.del);
-
-        if (typeof this.player.del !== undefined && this.player.del) {
-            this.drawableObjects[0].length = 0;
-            this.drawableObjects[1].length = 0;
-            this.message = 'You died!';
-            this.checkBestScore();
-            this.inAfterGameMenu = true;
-        }
-        this.drawCurrentScore();
     }
 
     checkBestScore() {
@@ -278,7 +249,7 @@ class Game {
 
     drawBackground() {
         this.ctx.beginPath();
-        this.ctx.fillStyle = "#020D56"
+        this.ctx.fillStyle = "#19061F"
         this.ctx.fillRect(0, 0, this.width, this.height);
         for (let star of this.arrayOfStars) {
             this.ctx.beginPath();

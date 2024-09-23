@@ -39,7 +39,7 @@ class Enemy {
 
     drawEnemy() {
         const enemyImage = new Image();
-        enemyImage.src = 'images/enemigos/enemy.png';
+        enemyImage.src = 'src/assets/enemigos/enemy.png';
         this.ctx.drawImage(enemyImage, this.x, this.y, this.width, this.height);
 
         // Draw health bar only if damage has been taken
@@ -84,7 +84,7 @@ class Enemy1 extends Enemy {
 
     drawEnemy() {
         const enemyImage = new Image();
-        enemyImage.src = 'images/enemigos/enemy2.png'; // Asegúrate de que la ruta de la imagen sea correcta
+        enemyImage.src = 'src/assets/enemigos/enemy2.png'; // Asegúrate de que la ruta de la imagen sea correcta
         this.ctx.drawImage(enemyImage, this.x, this.y, this.width, this.height);
 
         if (this.countOfLives < 10) {
