@@ -6,7 +6,7 @@ class Player {
         this.ctx = ctx;
         this.countOfLives = 10;
         this.damage = 1;
-        this.maxFiringFrequency = 300; // Shot every Milliseconds
+        this.maxFiringFrequency = 300; 
         this.immortal = false;
         this.timeOfLastImmortal = Date.now();
         this.timeOfLastShot = Date.now();
@@ -18,7 +18,24 @@ class Player {
         this.speed = this.width / 40;
         this.x = x - this.width / 2;
         this.y = y - this.height / 2;
-        console.log(`Player created at ${this.x} ${this.y}`);
+        
+        // Crear el Worker
+        this.worker = new Worker('./src/workers/drawPlayerWorker.js');
+        
+        // Escuchar los mensajes del Worker
+        this.worker.onmessage = (e) => {
+            const { playerImgSrc, x, y, width, height, radius } = e.data;
+            this.img.src = playerImgSrc;
+            
+            // Dibuja el jugador
+            this.ctx.drawImage(this.img, x, y, width, height);
+            this.ctx.beginPath();
+            this.ctx.fillStyle = 'rgba(255,0,0,0.51)';
+            this.ctx.arc(x + width / 2, y + height / 2, radius, 0, Math.PI * 2);
+            this.ctx.fill();
+            this.ctx.closePath();
+        };
+        
         switch (controlledBy) {
             case 1:
                 this.movemenetInterval = setInterval(this.controlledByMouse, 1, this);
@@ -44,7 +61,19 @@ class Player {
             this.death();
         }
         this.drawLifes();
-        this.drawPlayer();
+        
+        // Enviar datos al Worker
+        this.worker.postMessage({
+            playerData: {
+                x: this.x,
+                y: this.y,
+                width: this.width,
+                height: this.height,
+                radius: this.radius
+            },
+            currentTime: Date.now()
+        });
+
         if (this.immortal) {
             this.drawImmortal();
             if (Date.now() - 3000 - this.timeOfLastImmortal >= 0) {
@@ -58,35 +87,6 @@ class Player {
         }
     }
 
-    drawPlayer() {
-        let playerImg = new Image();
-        
-        // Calcular el tiempo que ha pasado desde que el jugador empezó a moverse
-        const timeMoving = Date.now() % 900; // 3 fases de 300 ms cada una
-    
-        // Mostrar las diferentes imágenes en función del tiempo transcurrido
-        if (timeMoving < 300) {
-            // Fase 1: Primera imagen del jugador
-            playerImg.src = 'src/assets/player/player_1.png';
-        } else if (timeMoving < 600) {
-            // Fase 2: Segunda imagen del jugador
-            playerImg.src = 'src/assets/player/player_2.png';
-        } else {
-            // Fase 3: Tercera imagen del jugador
-            playerImg.src = 'src/assets/player/player_3.png';
-        }
-        
-        // Dibujar la imagen del jugador en el lienzo
-        this.ctx.drawImage(playerImg, this.x, this.y, this.width, this.height);
-        
-        // Dibujar un círculo rojo alrededor del jugador (opcional, para efectos visuales)
-        this.ctx.beginPath();
-        this.ctx.fillStyle = 'rgba(255,0,0,0.51)';
-        this.ctx.arc(this.x + this.width / 2, this.y + this.height / 2, this.radius, 0, Math.PI * 2);
-        this.ctx.fill();
-        this.ctx.closePath();
-    }
-    
 
     drawLifes() {
         const shieldImg = new Image();
