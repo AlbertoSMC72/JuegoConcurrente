@@ -1,40 +1,32 @@
 self.onmessage = function (e) {
-    console.log('Worker received message:', e.data);
-    const { action, bulletData } = e.data;
-    
-    switch(action) {
-        case 'move':
-            bulletData.y -= bulletData.speed * Math.sin(bulletData.angle);
-            bulletData.x -= bulletData.speed * Math.cos(bulletData.angle);
-            self.postMessage({ action: 'moved', bulletData });
-            break;
-        
-        case 'checkCrush':
-            let isCrushed = checkCrush(bulletData);
-            self.postMessage({ action: 'crushChecked', isCrushed, bulletData });
-            break;
-    }
-};
+    const { x, y, speed, angle, canvasWidth, canvasHeight, damageToPlayer, damageToEnemy, obstacles } = e.data;
 
-function checkCrush(bulletData) {
-    const { canvasHeight, canvasWidth, radius, x, y, objGame } = bulletData;
-    
-    if (y + radius * 2 < 0 || y > canvasHeight || x < 0 || x > canvasWidth) {
-        return true;
+    // Mover la bala
+    const newY = y - speed * Math.sin(angle);
+    const newX = x - speed * Math.cos(angle);
+
+    // Verificar si la bala salió del canvas
+    let del = false;
+    if (newY < 0 || newY > canvasHeight || newX < 0 || newX > canvasWidth) {
+        del = true;
     }
 
-    for (const obj of objGame.drawableObjects[1]) {
-        if (Math.pow(obj.x + obj.width / 2 - x, 2) + Math.pow(obj.y + obj.height / 2 - y, 2) <= Math.pow(obj.radius, 2)) {
-            if (obj.type === 'player' && bulletData.damageToPlayer !== 0) {
-                obj.takeDamage(bulletData.damageToPlayer);
-            }
-            if (obj.type === 'enemy' && bulletData.damageToEnemy !== 0) {
-                obj.countOfLives -= bulletData.damageToEnemy;
-                bulletData.objGame.currentScore += bulletData.damageToEnemy;
-            }
-            return true;
+    // Verificar colisiones con obstáculos o enemigos
+    let hitObject = null;
+    for (const obj of obstacles) {
+        const distance = Math.pow(obj.x + obj.width / 2 - newX, 2) + Math.pow(obj.y + obj.height / 2 - newY, 2);
+        if (distance <= Math.pow(obj.radius, 2)) {
+            hitObject = obj;
+            del = true;
+            break;
         }
     }
 
-    return false;
-}
+    // Enviar de vuelta los resultados, incluyendo detalles de hitObject si es que hay colisión
+    self.postMessage({
+        newX,
+        newY,
+        del,
+        hitObject,
+    });
+};

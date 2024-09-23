@@ -1,5 +1,4 @@
 self.onmessage = function(e) {
-    console.log('Obstacle Worker is working');
     const { x, y, speed, angle, radius, canvasWidth, canvasHeight } = e.data;
 
     // Calcula el movimiento basado en la velocidad y ángulo
