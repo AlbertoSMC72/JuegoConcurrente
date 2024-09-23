@@ -1,4 +1,3 @@
-// drawPlayerWorker.js
 onmessage = function(e) {
     const { playerData, currentTime } = e.data;
     const timeMoving = currentTime % 900; 
@@ -12,7 +11,6 @@ onmessage = function(e) {
         playerImgSrc = 'src/assets/player/player_3.png';
     }
     
-    // Devolver los datos al hilo principal
     postMessage({
         playerImgSrc,
         x: playerData.x,

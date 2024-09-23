@@ -62,7 +62,6 @@ class Player {
         }
         this.drawLifes();
         
-        // Enviar datos al Worker
         this.worker.postMessage({
             playerData: {
                 x: this.x,
